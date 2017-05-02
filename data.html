@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+	<title>Page</title>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+
+
+	
+
+</head>
+
+<body>
+
+	<div class="jumbotron">
+
+		<h1 class="text-center">User</h1>
+
+	</div>
+
+	<div class="container">
+
+
+      <div class = "row">
+
+                 <div class = "col-md-12" Id = "UserChoose" > 
+                 USER0
+
+      </div> 
+
+
+	    <div class = "row">
+
+                 <div class = "col-md-12" Id = "TestList"> 
+
+
+        </div> 
+
+         <div class = "row">
+
+                 <div class = "col-md-12" Id = "compareDisplay"> 
+
+
+        </div> 
+
+
+
+	    <div class = "row">
+
+                 <div class = "col-md-12" Id = "Timer" > 
+
+        </div> 
+
+
+
+
+
+	    <div class = "row"> 
+
+       <div class = "row">
+
+                 <div class = "col-md-12" Id = "typeQuiz" > 
+
+       </div> 
+
+			
+
+			<div class="form-group">
+
+                <label for="Product">Answer:</label>
+
+                <input type="text" class="form-control" id="Quan">
+
+			</div>
+                <button type="submit" class="btn btn-default" id="cs1"><i class="fa fa-search"></i> USERCHANGE</button>
+                
+                <button type="submit" class="btn btn-default" id="run-search"><i class="fa fa-search"></i> Start</button>
+                <button type="submit" class="btn btn-default" id="submitDo"><i class="fa fa-search"></i> Submit</button>
+                <button type="submit" class="btn btn-default" id="compa"><i class="fa fa-search"></i> Compare</button>
+
+
+		</div>
+
+        <div class = "row">
+
+                 <div class = "col-md-12" Id = "TimeTest"> 
+
+        </div> 
+
+	</div>
+
+	 <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+
+	 <script>
+     var timeLeft;
+     var timeInterval;
+     var TrainNamen = []; 
+     var  countQuize;
+     var  quizPeople =[];
+     var  answerContainer =[];
+     var usertype = 0 ;
+
+	   window.onload = function(){
+       
+       $("#cs1").on("click", function(event) {
+         if(usertype == 0){
+            usertype =1 ; 
+            $("#UserChoose").html("");
+            $("#UserChoose").html("USER1");
+
+         }else{
+            usertype = 0; 
+            $("#UserChoose").html("");
+            $("#UserChoose").html("USER0");
+
+         }
+
+
+
+       }); 
+
+
+
+
+
+
+       var socketsMan = io.connect(); 
+
+            socketsMan.emit('listfirst');
+
+
+        $("#compa").on("click", function(event) {
+             $("#compareDisplay").html("");   
+             console.log("hi");
+            
+             socketsMan.emit('compareMan');
+
+
+       }); 
+        
+        socketsMan.on('receiverCom', function(data){
+            var x = "Compare : ";
+            console.log(data);
+
+            for(var i = 0 ; i <data.length ; i ++){
+             x = x + " | " + data[i];  
+            console.log(x);
+
+            }
+
+            
+
+            $("#compareDisplay").html(x);   
+
+
+
+        });
+
+
+
+
+
+
+           socketsMan.on('goback', function(data){
+
+           	socketsMan.emit('listfirst');
+
+           });
+
+
+
+
+
+
+
+            socketsMan.on('firstlist', function(data){
+
+
+              $("#TestList").html("");
+
+              
+              
+            
+              for( var i = 0 ; i < data.length ; i++){
+
+              	var goodDiv = $("<div>"); 
+
+              	goodDiv.text(data[i]);
+
+                $("#TestList").append( goodDiv );   
+
+              }   
+             
+              
+
+              //$("#TestList").append(data[1]);   
+
+              
+
+              
+
+		   });
+
+            socketsMan.on('updateQ', function(data){
+
+            
+
+              socketsMan.emit('updateR', data);
+
+
+
+              
+
+		   });
+
+
+
+           
+
+
+
+
+
+
+
+          $("#run-search").on("click", function(event) {
+             answerContainer =[];
+             countQuize =5;
+             TrainNamen = [];
+          	 quizPeople =[];
+             var questions = [" 1 + 1 = ?", " 2 - 1 = ?",  " 3 * 5 = ? " , " 20 / 5 = ? ", " 7 - 2 * 5  = ? " ];
+             var selectList =  new Array(5);
+     		     selectList[0]= ["0", "1", "2", "3"];
+             selectList[1]= ["-1", "0", "1", "2"];
+             selectList[2]= [ "12", "13", "14", "15"];
+             selectList[3]= [ "4", "5", "6", "7"];
+             selectList[4]= [ "1", "25" , "-3", "-6"];
+             var answerSheet = ["2", "0", "15", "4" , "-3"]; 
+             function quizMan ( question, listOfChoose, answer ){
+             this.questionofS = question;
+             this.listofSelect = listOfChoose;
+             this.anwerOfQ = answer;     
+             this.result = true;
+			 }
+             for( var i = 0 ; i < 5 ; i ++ ){
+             var inputQuiz = new quizMan (questions[i], selectList[i],
+             answerSheet[i]);
+             quizPeople.push(inputQuiz);
+
+             }
+             console.log( quizPeople);
+             
+            
+             
+             
+                
+             
+              doit();
+              //console.log("end");
+                
+
+	         
+
+
+	             //quizPeople.splice(i, 1);
+	               
+            
+          
+     
+
+	       
+	       
+
+
+
+           });
+
+
+
+		   socketsMan.on('smart', function(data){
+
+              $("#TimeTest").html(data);      
+
+             
+
+
+
+              
+
+		   });
+
+
+   
+    $("#submitDo").on("click", function(event) {
+      var receiverAnswer =  parseInt($("#Quan").val().trim());
+      if(isNaN(receiverAnswer)){
+          receiverAnswer = 0; 
+      }
+      answerContainer.push(receiverAnswer);
+      countQuize =  countQuize-1;
+      console.log(answerContainer);
+      if(countQuize != 0 ){
+          clearInterval(timeInterval); 
+          doit();
+
+      }else{
+          //console.log("hi");
+          clearInterval(timeInterval);
+          nextPhaze();
+      }
+
+
+
+    });
+
+
+	   
+
+    var nextPhaze = function(){
+         
+          countQuize= 5;
+         var newContainer = [] ;
+         for (var i = 0 ; i < answerContainer.length ;i ++){
+             newContainer.push(answerContainer[i]);
+
+         }
+         newContainer.push(usertype);
+          
+         console.log(newContainer);
+           console.log("send answer");
+           socketsMan.emit('rint', newContainer);
+      
+       
+        
+
+
+
+    }
+
+   
+    
+
+
+    var doit = function(){
+       timeLeft=3;
+       $("#typeQuiz").html("");
+       var goodDiv2 = $("<div>"); 
+       var newNum = countQuize-1;
+       goodDiv2.text(quizPeople[newNum].questionofS);
+
+       $("#typeQuiz").append( goodDiv2 );
+       
+       timeInterval = setInterval( solveP, 1000*2);
+        
+
+
+     } 
+
+    
+
+     
+
+     
+    var solveP = function(){
+                  
+
+                     if ( timeLeft == 0) {
+                       $("#Timer").html("End");
+                         console.log( "main event");
+                         var receiverAnswer =  parseInt($("#Quan").val().trim());
+                           if(isNaN(receiverAnswer)){
+                             receiverAnswer = 0; 
+                           }
+                         answerContainer.push(receiverAnswer);
+                         countQuize =  countQuize-1;
+                         console.log(answerContainer);
+                         if(countQuize != 0 ){
+                         clearInterval(timeInterval); 
+                         doit();
+
+                         }else{
+                         //console.log("hi");
+                         clearInterval(timeInterval);
+                         nextPhaze();
+                         }
+
+       
+                       }
+                     else {
+                          console.log( timeLeft);
+                          $("#Timer").html( "Timer : " + timeLeft);
+                          timeLeft =  timeLeft -1 ;
+                      }
+                
+                /*
+                var theValue = document.getElementById("#Timer").getAttribute("value");
+                $("#Timer").html(theValue-1+"");
+                $("#Timer").val(theValue-1);
+                  
+                   if(theValue == 0 ){
+                        //quizPeople.splice(0, 1);
+                      clearInterval(timeInterval);
+              
+           }
+                  */
+
+     }
+
+  }
+
+
+
+	 </script>
+
+	
+
+</body>
+
+</html>
