@@ -26,11 +26,12 @@ serverMan.listen(PORT, function() {
 
 });
 
+var connection;
 
-
-
-
-var connection = mysql.createConnection({
+if (process.env.JAWSDB_URL) {
+  connection = mysql.createConnection(process.env.JAWSDB_URL);
+} else{
+  connection = mysql.createConnection({
 
   host: "localhost",
 
@@ -52,7 +53,7 @@ var connection = mysql.createConnection({
 
 });
 
-
+};
 
 connection.connect(function(err) {
 
