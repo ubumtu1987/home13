@@ -95,7 +95,7 @@
 
 	</div>
 
-	 <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.1/socket.io.js"></script>
 
 	 <script>
      var timeLeft;
@@ -129,8 +129,8 @@
 
 
 
-
-       var socketsMan = io.connect(); 
+ 
+       var socketsMan = io.connect("http://localhost:8000"); 
 
             socketsMan.emit('listfirst');
 
